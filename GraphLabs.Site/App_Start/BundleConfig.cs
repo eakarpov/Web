@@ -22,6 +22,8 @@ namespace GraphLabs.Site.App_Start
 
             bundles.Add(new ScriptBundle("~/bundles/Common/TestPool").Include("~/Scripts/Common/TestPool.js"));
 
+            bundles.Add(new ScriptBundle("~/bundles/Common/TestQuestion").Include("~/Scripts/Common/TestQuestion.js"));
+
             // Используйте версию Modernizr для разработчиков, чтобы учиться работать. Когда вы будете готовы перейти к работе,
             // используйте средство построения на сайте http://modernizr.com, чтобы выбрать только нужные тесты.
             bundles.Add(new ScriptBundle("~/bundles/modernizr").Include(
