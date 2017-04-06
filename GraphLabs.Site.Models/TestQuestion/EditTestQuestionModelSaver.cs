@@ -22,12 +22,15 @@ namespace GraphLabs.Site.Models.TestQuestion
     {
 
         private readonly IOperationContextFactory<IGraphLabsContext> _operationContextFactory;
+        private readonly IEntityBasedModelSaver<AnswerVariantModel, DomainModel.AnswerVariant> _modelSaver;
 
         public EditTestQuestionModelSaver(
-            IOperationContextFactory<IGraphLabsContext> operationContextFactory
+            IOperationContextFactory<IGraphLabsContext> operationContextFactory,
+            IEntityBasedModelSaver<AnswerVariantModel, DomainModel.AnswerVariant> modelSaver
             ) : base(operationContextFactory)
         {
             _operationContextFactory = operationContextFactory;
+            _modelSaver = modelSaver;
         }
 
         protected override Action<DomainModel.TestQuestion> GetEntityInitializer(EditTestQuestionModel model, IEntityQuery query)
@@ -36,8 +39,10 @@ namespace GraphLabs.Site.Models.TestQuestion
             var entityCategory = query.Get<DomainModel.Category>(model.Category.Id); 
             model.AnswerVariants.ForEach(t =>
             {
-                    var entityAnswer = query.Get<DomainModel.AnswerVariant>(t.Id);
-                    entity.Add(entityAnswer);
+                var entityAnswer = query.Get<DomainModel.AnswerVariant>(t.Id);
+                entityAnswer.Answer = t.Answer;
+                entityAnswer.IsCorrect = t.IsCorrect;
+                entity.Add(entityAnswer);
             });
             return g =>
             {

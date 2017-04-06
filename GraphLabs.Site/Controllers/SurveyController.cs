@@ -39,20 +39,23 @@ namespace GraphLabs.Site.Controllers
 	    private readonly ICategoryRepository _categoryRepository;
         private readonly IEntityBasedModelLoader<TestPoolModel, TestPool> _modelPoolLoader;
 	    private readonly IEntityBasedModelRemover<EditTestQuestionModel, TestQuestion> _modelRemover;
-	    private readonly IEntityBasedModelSaver<EditTestQuestionModel, TestQuestion> _modelSaver; 
+	    private readonly IEntityBasedModelSaver<EditTestQuestionModel, TestQuestion> _modelSaver;
+	    private readonly IEntityBasedModelRemover<AnswerVariantModel, AnswerVariant> _modelAnswerRemover; 
 
         public SurveyController(
             ISurveyRepository surveyRepository,
             ICategoryRepository categoryRepository,
             IEntityBasedModelLoader<TestPoolModel, TestPool> modelPoolLoader,
             IEntityBasedModelRemover<EditTestQuestionModel, TestQuestion> modelRemover,
-            IEntityBasedModelSaver<EditTestQuestionModel, TestQuestion> modelSaver)
+            IEntityBasedModelSaver<EditTestQuestionModel, TestQuestion> modelSaver,
+            IEntityBasedModelRemover<AnswerVariantModel, AnswerVariant> modelAnswerRemover)
         {
             _modelPoolLoader = modelPoolLoader;
             _modelRemover = modelRemover;
 	        _surveyRepository = surveyRepository;
 	        _categoryRepository = categoryRepository;
             _modelSaver = modelSaver;
+            _modelAnswerRemover = modelAnswerRemover;
         }
 
 	    #region Просмотр списка
@@ -157,37 +160,44 @@ namespace GraphLabs.Site.Controllers
         {
             var emptyQuestion = new SurveyCreatingModel(_surveyRepository, _categoryRepository);
             emptyQuestion.Question = "";
-            emptyQuestion.QuestionOptions.Add(new KeyValuePair<string, bool>("", true));
 
             return View("~/Views/Survey/Create.cshtml", emptyQuestion);
         }
 
         [HttpPost]
-        public ActionResult Create(string question, Dictionary<string, bool> questionOptions, long categoryId)
+        public ActionResult Create(string question, long categoryId)
         {
-            //Question, QuestionOptions, CategoryId
-            var model = new SurveyCreatingModel(_surveyRepository, _categoryRepository)
+            if (SurveyCreatingModel.IsValid(question))
             {
-                CategoryId = categoryId,
-                QuestionOptions = questionOptions.ToList(),
-                Question = question
-            };
-
-            if (model.IsValid)
-            {
-                model.Save();
-				return RedirectToAction("Index", new RouteValueDictionary { { "CategoryId", categoryId } });
+                var modelToSave = new EditTestQuestionModel
+                {
+                    Id = 0,
+                    Question = question,
+                    AnswerVariants = new AnswerVariantModel[0],
+                    Category = new CategoryModel
+                    {
+                        Id = categoryId,
+                        Name = _categoryRepository.GetById(categoryId).Name
+                    }
+                };
+                var entity = _modelSaver.CreateOrUpdate(modelToSave);
+                return RedirectToAction("Edit", new {questionId = entity.Id});
             }
+            var emptyQuestion = new SurveyCreatingModel(_surveyRepository, _categoryRepository);
+            emptyQuestion.Question = question;
+            emptyQuestion.CategoryId = categoryId;
+       
+            return View("~/Views/Survey/Create.cshtml", emptyQuestion);
+        }
 
-			return View("~/Views/Survey/Create.cshtml", model);
-		}
-
-	    [HttpPost]
-	    public ActionResult Delete(TestQuestionModel testQuestionModel)
+	    [HttpGet]
+	    public ActionResult Delete(long testQuestionId)
 	    {
 	        try
 	        {
-	            _modelRemover.Remove(testQuestionModel.Id);
+                var entity = _surveyRepository.GetAllQuestions().Single(t => t.Id == testQuestionId);
+                this.BeforeRemove(entity);
+	            _modelRemover.Remove(testQuestionId);
 	            return RedirectToAction("Index");
 	        }
 	        catch (Exception e)
@@ -196,6 +206,11 @@ namespace GraphLabs.Site.Controllers
 	        }
 	    }
 
-		#endregion
-	}
+        public void BeforeRemove(TestQuestion model)
+        {
+            model.AnswerVariants.ForEach(t => _modelAnswerRemover.Remove(t.Id));
+        }
+
+        #endregion
+    }
 }

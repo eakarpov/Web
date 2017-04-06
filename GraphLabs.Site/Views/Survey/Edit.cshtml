@@ -8,7 +8,7 @@
 <hgroup>
     <h2>@ViewBag.Title</h2>
     <a class="btn btn-primary" href="/survey/index">Обратно к списку</a>
-    <a class="btn btn-danger" href="@Html.ActionLink("Survey", "Delete", new {testQuestionModel = Model})">Удалить вопрос</a>
+    <a class="btn btn-danger" href="/survey/delete?testQuestionId=@Model.Id">Удалить вопрос</a>
 </hgroup>
 <br/>
 <div id="systemMessage"></div>
@@ -37,6 +37,11 @@
         <tbody>
         @for (var i = 0; i < Model.AnswerVariants.Count(); ++i)
         {
+            string myVar = "";
+            if (Model.AnswerVariants.ElementAt(i).IsCorrect)
+            {
+                myVar = "checked";
+            }
             <tr id="@i">
                 <td>
                     <input type="hidden" value="@Model.AnswerVariants.ElementAt(i).Id" id="id_@i"/>
@@ -44,14 +49,14 @@
                     <input type="hidden" value="@Model.Id" id="question_@i"/>
                 </td>
                 <td>
-                    <input type="checkbox" @{ new HtmlString((@Model.AnswerVariants.ElementAt(i).IsCorrect) ? "checked" : "");} id="isCorrect_@i"/>
+                    <input type="checkbox" @myVar id="isCorrect_@i"/>
                 </td>
                 <td>
-                    <img title="Клонировать ответ" src="/Images/copy.png" onclick="copyOption(@i);" />
-                    <img title="Удалить ответ" src="/Images/_false.png" onclick="deleteOption(@i);" />
+                    <img title="Клонировать ответ" src="/Images/copy.png" onclick="copyOption(@i);"/>
+                    <img title="Удалить ответ" src="/Images/_false.png" onclick="deleteOption(@i);"/>
                 </td>
             </tr>
-        }
+       }
         </tbody>
         </table>
     <input id="addOption" type="button" value="Добавить вариант ответа" onclick="addOption(@Model.Id);"/>
