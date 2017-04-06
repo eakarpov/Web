@@ -343,6 +343,7 @@
     <Compile Include="App_Start\SiteServicesConfiguration.cs" />
     <Compile Include="App_Start\WebApiConfig.cs" />
     <Compile Include="Controllers\AccountController.cs" />
+    <Compile Include="Controllers\AnswerController.cs" />
     <Compile Include="Controllers\Attributes\AcceptParameter.cs" />
     <Compile Include="Controllers\Attributes\GLAuthorizeAttribute.cs" />
     <Compile Include="Controllers\DemoLabController.cs" />

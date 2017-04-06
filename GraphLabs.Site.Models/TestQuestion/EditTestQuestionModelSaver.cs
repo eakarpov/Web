@@ -36,27 +36,8 @@ namespace GraphLabs.Site.Models.TestQuestion
             var entityCategory = query.Get<DomainModel.Category>(model.Category.Id); 
             model.AnswerVariants.ForEach(t =>
             {
-                if (t.Id != 0)
-                {
                     var entityAnswer = query.Get<DomainModel.AnswerVariant>(t.Id);
                     entity.Add(entityAnswer);
-                }
-                else
-                {
-                    using (var operation = _operationContextFactory.Create())
-                    {
-                        DomainModel.AnswerVariant entityAnswer;
-                        var type = typeof(DomainModel.AnswerVariant);
-                        Contract.Assert(typeof(DomainModel.AnswerVariant).IsAssignableFrom(type));
-                        entityAnswer = (DomainModel.AnswerVariant)operation.DataContext.Factory.Create(
-                            type,
-                            o => GetEntityInitializer(t, operation.DataContext.Query)((DomainModel.AnswerVariant)o));
-
-                        operation.Complete();
-
-                        entity.Add(entityAnswer);
-                    }
-                }
             });
             return g =>
             {

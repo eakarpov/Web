@@ -148,6 +148,7 @@
       <Link>Properties\AssemblyVersion.cs</Link>
     </Compile>
     <Compile Include="AnswerVariant\AnswerVariantModel.cs" />
+    <Compile Include="AnswerVariant\AnswerVariantModelRemover.cs" />
     <Compile Include="AnswerVariant\AnswerVariantModelSaver.cs" />
     <Compile Include="AvailableLab\AvailableLabListModel.cs" />
     <Compile Include="AvailableLab\TestingLabListModel.cs" />

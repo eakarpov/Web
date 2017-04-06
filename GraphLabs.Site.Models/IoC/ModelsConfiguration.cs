@@ -1,4 +1,5 @@
 ﻿using GraphLabs.DomainModel;
+using GraphLabs.Site.Models.AnswerVariant;
 using GraphLabs.Site.Models.AvailableLab;
 using GraphLabs.Site.Models.CreateLab;
 using GraphLabs.Site.Models.Groups;
@@ -70,6 +71,10 @@ namespace GraphLabs.Site.Models.IoC
             container.RegisterType<IEntityBasedModelLoader<EditTestQuestionModel, DomainModel.TestQuestion>, EditTestQuestionModelLoader>(new PerResolveLifetimeManager());
             container.RegisterType<IEntityBasedModelRemover<EditTestQuestionModel, DomainModel.TestQuestion>, EditTestQuestionModelRemover>(new PerResolveLifetimeManager());
             container.RegisterType<IEntityBasedModelSaver<EditTestQuestionModel, DomainModel.TestQuestion>, EditTestQuestionModelSaver>(new PerResolveLifetimeManager());
+
+            // ответы
+            container.RegisterType<IEntityBasedModelRemover<AnswerVariantModel, DomainModel.AnswerVariant>, AnswerVariantModelRemover>(new PerResolveLifetimeManager());
+            container.RegisterType<IEntityBasedModelSaver<AnswerVariantModel, DomainModel.AnswerVariant>, AnswerVariantModelSaver>(new PerResolveLifetimeManager());
 
             // выполнение лабы
             container.RegisterType<IDemoVariantModelLoader, DemoVariantModelLoader>(new PerResolveLifetimeManager());

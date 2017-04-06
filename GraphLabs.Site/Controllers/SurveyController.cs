@@ -102,13 +102,11 @@ namespace GraphLabs.Site.Controllers
 	        try
 	        {
 	            _modelSaver.CreateOrUpdate(editTestQuestion);
-                var model = new SurveyIndexViewModel(_surveyRepository, _categoryRepository);
-                model.Load(0);
-                return View("~/Views/Survey/Index.cshtml", model);
+                return Json(true);
             }
 	        catch (Exception e)
 	        {
-	            return Json(e);
+	            return Json(false);
 	        }
 	    }
 

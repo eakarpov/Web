@@ -32,7 +32,7 @@ namespace GraphLabs.Site.Models.AnswerVariant
             return g =>
             {
                 g.Id = model.Id;
-                g.Answer = model.Answer;
+                g.Answer = model.Answer == null ? "" : model.Answer;
                 g.IsCorrect = model.IsCorrect;
                 g.TestQuestion = entity;
             };
