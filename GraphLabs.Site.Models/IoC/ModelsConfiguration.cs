@@ -18,7 +18,7 @@ using GraphLabs.Site.Models.TestPool;
 using GraphLabs.Site.Models.TestPoolEntry;
 using GraphLabs.Site.Utils.IoC;
 using Microsoft.Practices.Unity;
-using GraphLabs.Site.Models.Question;
+using GraphLabs.Site.Models.TestQuestion;
 
 namespace GraphLabs.Site.Models.IoC
 {
@@ -64,7 +64,12 @@ namespace GraphLabs.Site.Models.IoC
 
             // создание лабы
             container.RegisterType<IEntityBasedModelLoader<CreateLabModel, LabWork>, CreateLabModelLoader>(new PerResolveLifetimeManager());
-            container.RegisterType<IEntityBasedModelLoader<QuestionModel, TestQuestion>, QuestionModelLoader>(new PerResolveLifetimeManager());
+
+            // Тестовый вопросы
+            container.RegisterType<IEntityBasedModelLoader<TestQuestionModel, DomainModel.TestQuestion>, TestQuestionModelLoader>(new PerResolveLifetimeManager());
+            container.RegisterType<IEntityBasedModelLoader<EditTestQuestionModel, DomainModel.TestQuestion>, EditTestQuestionModelLoader>(new PerResolveLifetimeManager());
+            container.RegisterType<IEntityBasedModelRemover<EditTestQuestionModel, DomainModel.TestQuestion>, EditTestQuestionModelRemover>(new PerResolveLifetimeManager());
+            container.RegisterType<IEntityBasedModelSaver<EditTestQuestionModel, DomainModel.TestQuestion>, EditTestQuestionModelSaver>(new PerResolveLifetimeManager());
 
             // выполнение лабы
             container.RegisterType<IDemoVariantModelLoader, DemoVariantModelLoader>(new PerResolveLifetimeManager());

@@ -2,19 +2,19 @@
 using GraphLabs.Site.Models.Infrastructure;
 using System.Diagnostics.Contracts;
 
-namespace GraphLabs.Site.Models.Question
+namespace GraphLabs.Site.Models.TestQuestion
 {
-    internal sealed class QuestionModelLoader : AbstractModelLoader<QuestionModel, TestQuestion>
+    internal sealed class TestQuestionModelLoader : AbstractModelLoader<TestQuestionModel, DomainModel.TestQuestion>
     {
         /// <summary> Загрузчик моделей вопросов </summary>
-        public QuestionModelLoader(IEntityQuery query) : base(query) { }
+        public TestQuestionModelLoader(IEntityQuery query) : base(query) { }
 
         /// <summary> Загрузить по сущности-прототипу </summary>
-        public override QuestionModel Load(TestQuestion question)
+        public override TestQuestionModel Load(DomainModel.TestQuestion question)
         {
             Contract.Requires(question != null);
 
-            var model = new QuestionModel
+            var model = new TestQuestionModel
             {
                 Id = question.Id,
                 Question = question.Question,

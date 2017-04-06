@@ -38,8 +38,16 @@
                 data: {
                     CategoryId: $('#SelectedCategoryId').val()
                 },
-                success: function (data) {
+                success: (data) => {
                     $('#TestQuestionList').html(data);
+                    $('#TestQuestionList').children('table').attr('id', 'questionTable');
+                    $('#TestQuestionList')
+                        .children('#questionTable')
+                        .children('tbody')
+                        .children('tr').each((i, elem) => {
+                            var id = $(elem).children('td')[0].innerText;
+                            $(elem).append('<td><a href="/survey/edit?questionId=' + id + '">Редактировать</a></td>');
+                        });                  
                 }
             });
         }

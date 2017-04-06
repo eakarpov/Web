@@ -1,12 +1,12 @@
 ﻿using GraphLabs.DomainModel;
 using GraphLabs.Site.Controllers.Attributes;
-using GraphLabs.Site.Models.Question;
 using GraphLabs.Site.Models.Infrastructure;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Web;
 using System.Web.Mvc;
+using GraphLabs.Site.Models.TestQuestion;
 
 namespace GraphLabs.Site.Controllers
 {
@@ -27,7 +27,7 @@ namespace GraphLabs.Site.Controllers
 
         public ActionResult SelectQuestions()
         {
-            var model = _listModelLoader.LoadListModel<QuestionListModel, QuestionModel>();
+            var model = _listModelLoader.LoadListModel<TestQuestionListModel, TestQuestionModel>();
             return View(model);
         }
 

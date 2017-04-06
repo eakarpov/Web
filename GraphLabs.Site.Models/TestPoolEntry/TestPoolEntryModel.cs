@@ -17,7 +17,7 @@ namespace GraphLabs.Site.Models.TestPoolEntry
 
         public ScoringStrategy ScoringStrategy { get; set; }
 
-        public TestQuestion TestQuestion { get; set; }
+        public DomainModel.TestQuestion TestQuestion { get; set; }
 
         public DomainModel.TestPool TestPool { get; set; }
     }

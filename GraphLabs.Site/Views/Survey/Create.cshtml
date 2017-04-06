@@ -71,11 +71,11 @@
         $("#addOption").click(function () {
             optionsCount++;
             $("table").append("<tr><td>" +
-                "<input class=\"text-box single-line\" type=\"text\" value=\"\" id=\"QuestionOptions_" + optionsCount.toString() + "__Key\"" + 
-                "name=\"QuestionOptions[" + optionsCount.toString() + "].Key\" />" +
+                "<input class=\"text-box single-line\" type=\"text\" value=\"\" id=\"TestQuestionOptions_" + optionsCount.toString() + "__Key\"" +
+                "name=\"TestQuestionOptions[" + optionsCount.toString() + "].Key\" />" +
                 "</td><td>" +
-                "<input class=\"check-box\" data-val=\"true\" data-val-required=\"Требуется поле Value.\" id=\"QuestionOptions_" + optionsCount.toString() + "__Value\" name=\"QuestionOptions[" + optionsCount.toString() + "].Value\" type=\"checkbox\" value=\"true\" />" +
-                "<input name=\"QuestionOptions[" + optionsCount.toString() + "].Value\" type=\"hidden\" value=\"false\">" +
+                "<input class=\"check-box\" data-val=\"true\" data-val-required=\"Требуется поле Value.\" id=\"TestQuestionOptions_" + optionsCount.toString() + "__Value\" name=\"TestQuestionOptions[" + optionsCount.toString() + "].Value\" type=\"checkbox\" value=\"true\" />" +
+                "<input name=\"TestQuestionOptions[" + optionsCount.toString() + "].Value\" type=\"hidden\" value=\"false\">" +
                 "</td><td><img title=\"Клонировать ответ\" src=\"/Images/copy.png\" class=\"copyOption\" />" + "\n" +
                 "<img title=\"Удалить ответ\" src=\"/Images/_false.png\" class=\"deleteOption\" />" +
                 "</td></tr>");
@@ -86,28 +86,28 @@
             optionsCount--;
             for(i = 1; i < optionsCount + 3; ++i)
             {
-                $("table tr:eq(" + i + ") td input:eq(0)").attr("id","QuestionOptions_" + (i - 1).toString() + "__Key");
-                $("table tr:eq(" + i + ") td input:eq(0)").attr("name","QuestionOptions[" + (i - 1).toString() + "].Key");
+                $("table tr:eq(" + i + ") td input:eq(0)").attr("id","TestQuestionOptions_" + (i - 1).toString() + "__Key");
+                $("table tr:eq(" + i + ") td input:eq(0)").attr("name","TestQuestionOptions[" + (i - 1).toString() + "].Key");
 
-                $("table tr:eq(" + i + ") td input:eq(1)").attr("id","QuestionOptions_" + (i - 1).toString() + "__Value");
-                $("table tr:eq(" + i + ") td input:eq(1)").attr("name","QuestionOptions[" + (i - 1).toString() + "].Value");
+                $("table tr:eq(" + i + ") td input:eq(1)").attr("id","TestQuestionOptions_" + (i - 1).toString() + "__Value");
+                $("table tr:eq(" + i + ") td input:eq(1)").attr("name","TestQuestionOptions[" + (i - 1).toString() + "].Value");
 
-                $("table tr:eq(" + i + ") td input:eq(2)").attr("name","QuestionOptions[" + (i - 1).toString() + "].Value");
+                $("table tr:eq(" + i + ") td input:eq(2)").attr("name","TestQuestionOptions[" + (i - 1).toString() + "].Value");
             }
         });
 
         $(".copyOption").click(function () {
             $(this).parent().parent().clone().appendTo("table");
             optionsCount++;
-            
-            $("table tr:last td input:eq(0)").attr("id","QuestionOptions_" + optionsCount.toString() + "__Key");
-            $("table tr:last td input:eq(0)").attr("name","QuestionOptions[" + optionsCount.toString() + "].Key");
 
-            $("table tr:last td input:eq(1)").attr("id","QuestionOptions_" + optionsCount.toString() + "__Value");
-            $("table tr:last td input:eq(1)").attr("name","QuestionOptions[" + optionsCount.toString() + "].Value");
+            $("table tr:last td input:eq(0)").attr("id","TestQuestionOptions_" + optionsCount.toString() + "__Key");
+            $("table tr:last td input:eq(0)").attr("name","TestQuestionOptions[" + optionsCount.toString() + "].Key");
 
-            $("table tr:last td input:eq(2)").attr("name","QuestionOptions[" + optionsCount.toString() + "].Value");
+            $("table tr:last td input:eq(1)").attr("id","TestQuestionOptions_" + optionsCount.toString() + "__Value");
+            $("table tr:last td input:eq(1)").attr("name","TestQuestionOptions[" + optionsCount.toString() + "].Value");
+
+            $("table tr:last td input:eq(2)").attr("name","TestQuestionOptions[" + optionsCount.toString() + "].Value");
         });
-        
-    </script>
+
+</script>
 }

@@ -7,14 +7,20 @@ using Newtonsoft.Json;
 using System;
 using System.Web.Mvc;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.IO;
 using System.Web.Helpers;
 using System.Web.Routing;
 using GraphLabs.DomainModel;
 using GraphLabs.DomainModel.Repositories;
+using GraphLabs.Site.Models.AnswerVariant;
+using GraphLabs.Site.Models.Category;
 using GraphLabs.Site.Models.Infrastructure;
 using GraphLabs.Site.Models.TestPool;
+using GraphLabs.Site.Models.TestPoolEntry;
+using GraphLabs.Site.Models.TestQuestion;
+using WebGrease.Css.Extensions;
 
 namespace GraphLabs.Site.Controllers
 {
@@ -31,28 +37,80 @@ namespace GraphLabs.Site.Controllers
 	{
 	    private readonly ISurveyRepository _surveyRepository;
 	    private readonly ICategoryRepository _categoryRepository;
-        private readonly IEntityBasedModelLoader<TestPoolModel, TestPool> _modelLoader;
+        private readonly IEntityBasedModelLoader<TestPoolModel, TestPool> _modelPoolLoader;
+	    private readonly IEntityBasedModelRemover<EditTestQuestionModel, TestQuestion> _modelRemover;
+	    private readonly IEntityBasedModelSaver<EditTestQuestionModel, TestQuestion> _modelSaver; 
 
         public SurveyController(
             ISurveyRepository surveyRepository,
             ICategoryRepository categoryRepository,
-            IEntityBasedModelLoader<TestPoolModel, TestPool> modelLoader)
+            IEntityBasedModelLoader<TestPoolModel, TestPool> modelPoolLoader,
+            IEntityBasedModelRemover<EditTestQuestionModel, TestQuestion> modelRemover,
+            IEntityBasedModelSaver<EditTestQuestionModel, TestQuestion> modelSaver)
         {
-            _modelLoader = modelLoader;
+            _modelPoolLoader = modelPoolLoader;
+            _modelRemover = modelRemover;
 	        _surveyRepository = surveyRepository;
 	        _categoryRepository = categoryRepository;
-	    }
+            _modelSaver = modelSaver;
+        }
 
 	    #region Просмотр списка
 
 		[HttpGet]
-		public ActionResult Index(long CategoryId = 0)
+		public ActionResult Index(long categoryId = 0)
 		{
             var model = new SurveyIndexViewModel(_surveyRepository, _categoryRepository);
-            model.Load(CategoryId);
+            model.Load(categoryId);
 
 			return View("~/Views/Survey/Index.cshtml", model);
 		}
+
+	    [HttpGet]
+	    public ActionResult Edit(long questionId = 0)
+	    {
+            var entity = _surveyRepository.GetAllQuestions().Single(t => t.Id == questionId);
+            var modelAnswer = new AnswerVariantModel[entity.AnswerVariants.Count];
+	        for (int i = 0; i < entity.AnswerVariants.Count; i++)
+	        {
+	            modelAnswer[i] = new AnswerVariantModel
+                {
+                    Id = entity.AnswerVariants.ElementAt(i).Id,
+                    Answer = entity.AnswerVariants.ElementAt(i).Answer,
+                    IsCorrect = entity.AnswerVariants.ElementAt(i).IsCorrect,
+                    TestQuestion = entity.AnswerVariants.ElementAt(i).TestQuestion.Id
+                };
+            }
+            var modelCategory = new CategoryModel
+            {
+                Id = entity.Category.Id,
+                Name = entity.Category.Name
+            };
+            var model = new EditTestQuestionModel
+	        {
+                Id = entity.Id,
+                Question = entity.Question,
+                AnswerVariants = modelAnswer,
+                Category = modelCategory,
+            };
+	        return View("~/Views/Survey/Edit.cshtml", model);
+	    }
+
+	    [HttpPost]
+	    public ActionResult Edit(EditTestQuestionModel editTestQuestion)
+	    {
+	        try
+	        {
+	            _modelSaver.CreateOrUpdate(editTestQuestion);
+                var model = new SurveyIndexViewModel(_surveyRepository, _categoryRepository);
+                model.Load(0);
+                return View("~/Views/Survey/Index.cshtml", model);
+            }
+	        catch (Exception e)
+	        {
+	            return Json(e);
+	        }
+	    }
 
 		[HttpGet]
 		public ActionResult TestQuestionList(long CategoryId)
@@ -82,7 +140,7 @@ namespace GraphLabs.Site.Controllers
 	    public ActionResult LoadUnique(QuestionLookForModel input)
 	    {
 	        // Новый код подгружает только те вопросы, которых ещё нет в данном тестпуле
-	        var entity = _modelLoader.Load(input.TestPool);
+	        var entity = _modelPoolLoader.Load(input.TestPool);
 	        TestQuestion[] questions = _surveyRepository.GetQuestionsSimilarToString(input.Question);
 	        var questionArray = questions
                 .Where(q => entity.TestPoolEntries.All(t => t.TestQuestion.Question != q.Question))
@@ -107,24 +165,38 @@ namespace GraphLabs.Site.Controllers
         }
 
         [HttpPost]
-        public ActionResult Create(string Question, Dictionary<string, bool> QuestionOptions, long CategoryId)
+        public ActionResult Create(string question, Dictionary<string, bool> questionOptions, long categoryId)
         {
             //Question, QuestionOptions, CategoryId
             var model = new SurveyCreatingModel(_surveyRepository, _categoryRepository)
             {
-                CategoryId = CategoryId,
-                QuestionOptions = QuestionOptions.ToList(),
-                Question = Question
+                CategoryId = categoryId,
+                QuestionOptions = questionOptions.ToList(),
+                Question = question
             };
 
             if (model.IsValid)
             {
                 model.Save();
-				return RedirectToAction("Index", new RouteValueDictionary { { "CategoryId", CategoryId } });
+				return RedirectToAction("Index", new RouteValueDictionary { { "CategoryId", categoryId } });
             }
 
 			return View("~/Views/Survey/Create.cshtml", model);
 		}
+
+	    [HttpPost]
+	    public ActionResult Delete(TestQuestionModel testQuestionModel)
+	    {
+	        try
+	        {
+	            _modelRemover.Remove(testQuestionModel.Id);
+	            return RedirectToAction("Index");
+	        }
+	        catch (Exception e)
+	        {
+	            return Json(false);
+	        }
+	    }
 
 		#endregion
 	}

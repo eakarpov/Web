@@ -1,0 +1,153 @@
+﻿@model GraphLabs.Site.Models.TestQuestion.EditTestQuestionModel
+
+@{
+    ViewBag.Title = "Создание тестового вопроса";
+    @Styles.Render("~/Content/bootstrap")
+}
+
+<hgroup>
+    <h2>@ViewBag.Title</h2>
+    <a class="btn btn-primary" href="/survey/index">Обратно к списку</a>
+    <a class="btn btn-danger" href="@Html.ActionLink("Survey", "Delete", new {testQuestionModel = Model})">Удалить вопрос</a>
+</hgroup>
+<br/>
+<div id="systemMessage"></div>
+    <div class="editor-label">
+        Категория вопроса: <b> @Model.Category.Name </b>
+       <br />
+    </div>
+    <div class="editor-label">
+        <h3>Текст вопроса</h3>
+    </div>
+    <div class="editor-field">
+        <input id="question" type="text" value="@Model.Question"/>
+    </div>
+<div id="questionId" hidden="true">@Model.Id</div>
+<div id="categoryId" hidden="true">@Model.Category.Id</div>
+<div id="categoryName" hidden="true">@Model.Category.Name</div>
+    <table id="answers">
+        <thead>
+            <th>
+                Варианты ответов
+            </th>
+            <th>
+                Верность
+            </th>
+        </thead>
+        <tbody>
+        @for (var i = 0; i < Model.AnswerVariants.Count(); ++i)
+        {
+            <tr>
+                <td>
+                    <input type="hidden" value="@Model.AnswerVariants.ElementAt(i).Id" id="id_@i"/>
+                    <input type="text" value="@Model.AnswerVariants.ElementAt(i).Answer" id="answer_@i"/>
+                    <input type="hidden" value="@Model.Id" id="question_@i"/>
+                </td>
+                <td>
+                    <input type="checkbox" value="@Model.AnswerVariants.ElementAt(i).IsCorrect" id="isCorrect_@i"/>
+                </td>
+                <td>
+                    <img title="Клонировать ответ" src="/Images/copy.png" onclick="copyOption(@i);" />
+                    <img title="Удалить ответ" src="/Images/_false.png" class="deleteOption" />
+                </td>
+            </tr>
+        }
+        </tbody>
+        </table>
+    <input id="addOption" type="button" value="Добавить вариант ответа" onclick="addOption(@Model.Id);"/>
+    <p>
+        <input type="submit" value="Сохранить" onclick="sendModel();"/>
+    </p>
+
+@section Scripts
+{
+    <script>
+        var addOption = (question) => {
+            var id_max = $("#answers").children('tbody').children('tr').size();
+            $("#answers").children('tbody').append('' +
+                '<tr>' +
+                '<td>' +
+                '<input type="hidden" value="0" id="id_' + id_max + '"/>' +
+                '<input type="text" value="" id="answer_' + id_max + '"/>' +
+                '<input type="hidden" value="' + question + '" id="question_' + id_max + '"/>' +
+                '</td>' +
+                '<td>' +
+                '<input type="checkbox" value="false" id="isCorrect_' + id_max + '"/>' +
+                '</td>' +
+                '<td>' +
+                '<img title="Клонировать ответ" src="/Images/copy.png" class="copyOption" />' +
+                '<img title="Удалить ответ" src="/Images/_false.png" class="deleteOption" />' +
+                '</td>' +
+                '</tr>');
+        };
+
+        var sendModel = () => {
+            var answers = [];
+            var trs = $("#answers").children('tbody').children('tr');
+            var table = $("#answers").children('tbody');
+            for (var i = 0; i < $(trs).length; i++) {
+                var answer = {};
+                answer.Id = parseInt($(table).children(':nth-child(' + (i + 1) + ')').children(':nth-child(1)').children('#id_' + i).val());
+                answer.Answer = $(table).children(':nth-child(' + (i + 1) + ')').children(':nth-child(1)').children('#answer_' + i).val();
+                answer.IsCorrect = $(table).children(':nth-child(' + (i + 1) + ')').children(':nth-child(2)').children('#isCorrect_' + i + ':checked').length === 1;
+                answer.TestQuestion = parseInt($(table).children(':nth-child(' + (i + 1) + ')').children(':nth-child(1)').children('#question_' + i).val());
+                answers.push(answer);
+            }
+            console.log(JSON.stringify({
+                Id: parseInt($("#questionId").text()),
+                Question: $("#question").val(),
+                Category: {
+                    Id: parseInt($("#categoryId").text()),
+                    Name: $("#categoryName").text()
+                },
+                AnswerVariants: answers
+            }));
+            $.ajax({
+                url: '/Survey/Edit',
+                method: "POST",
+                data: JSON.stringify({
+                    Id: parseInt($("#questionId").text()),
+                    Question: $("#question").val(),
+                    Category: {
+                        Id: parseInt($("#categoryId").text()),
+                        Name: $("#categoryName").text()
+                    },
+                    AnswerVariants: answers
+                }),
+                contentType: "application/json; charset=utf-8",
+                success: (data) => {
+                    $().html(data);
+                }
+            });
+        };
+
+        $(".deleteOption").click(() => {
+            $(this).parent().parent().remove();
+        });
+
+        var copyOption = (i) => {
+            var trs = $("#answers").children('tbody').children('tr');
+            var table = $("#answers").children('tbody');
+            var answer = $(table).children(':nth-child(' + (i + 1) + ')').children(':nth-child(1)').children('#answer_' + i).val();
+            var isCorrect = $(table).children(':nth-child(' + (i + 1) + ')').children(':nth-child(2)').children('#isCorrect_' + i + ':checked').length === 1;
+            var testQuestion = $(table).children(':nth-child(' + (i + 1) + ')').children(':nth-child(1)').children('#question_' + i).val();
+            var id_max = $("#answers").children('tbody').children('tr').size();
+            $("#answers").children('tbody').append('' +
+                '<tr>' +
+                '<td>' +
+                '<input type="hidden" value="' + 0 + '" id="id_' + id_max + '"/>' +
+                '<input type="text" value="' + answer + '" id="answer_' + id_max + '"/>' +
+                '<input type="hidden" value="' + testQuestion + '" id="question_' + id_max + '"/>' +
+                '</td>' +
+                '<td>' +
+                '<input type="checkbox" value="' + isCorrect + '" id="isCorrect_' + id_max + '"/>' +
+                '</td>' +
+                '<td>' +
+                '<img title="Клонировать ответ" src="/Images/copy.png" onclick="copyOption(' + (id_max + 1) + ');" />' +
+                '<img title="Удалить ответ" src="/Images/_false.png" class="deleteOption" />' +
+                '</td>' +
+                '</tr>');
+        };
+
+    </script>
+}

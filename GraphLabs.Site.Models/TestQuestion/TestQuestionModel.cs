@@ -6,12 +6,12 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace GraphLabs.Site.Models.Question
+namespace GraphLabs.Site.Models.TestQuestion
 {
-    public class QuestionModel : IEntityBasedModel<TestQuestion>
+    public class TestQuestionModel : IEntityBasedModel<DomainModel.TestQuestion>
     {
         public long Id { get; set; }
         public string Question { get; set; }
-        public virtual Category Category { get; set; }
+        public virtual DomainModel.Category Category { get; set; }
     }
 }

@@ -11,43 +11,42 @@ using GraphLabs.DomainModel.Contexts;
 using GraphLabs.DomainModel.Extensions;
 using GraphLabs.Site.Core.OperationContext;
 using GraphLabs.Site.Models.TestPoolEntry;
+using GraphLabs.Site.Models.TestQuestion;
 using Microsoft.Practices.ObjectBuilder2;
 
-namespace GraphLabs.Site.Models.TestPoolEntry
+namespace GraphLabs.Site.Models.AnswerVariant
 {
-    internal sealed class SaveTestPoolEntryModelSaver : AbstractModelSaver<SaveTestPoolEntryModel, DomainModel.TestPoolEntry>
+    internal sealed class AnswerVariantModelSaver : AbstractModelSaver<AnswerVariantModel, DomainModel.AnswerVariant>
     {
-        public SaveTestPoolEntryModelSaver(
+
+
+        public AnswerVariantModelSaver(
             IOperationContextFactory<IGraphLabsContext> operationContextFactory
             ) : base(operationContextFactory)
         {
         }
 
-        protected override Action<DomainModel.TestPoolEntry> GetEntityInitializer(SaveTestPoolEntryModel model, IEntityQuery query)
+        protected override Action<DomainModel.AnswerVariant> GetEntityInitializer(AnswerVariantModel model, IEntityQuery query)
         {
-            var entityPool = query.Get<DomainModel.TestPool>(model.TestPool);
-            var entityQuestion = query.Get<DomainModel.TestQuestion>(model.TestQuestion);
-
+            var entity = query.Get<DomainModel.TestQuestion>(model.TestQuestion);
             return g =>
             {
                 g.Id = model.Id;
-                g.Score = model.Score;
-                g.ScoringStrategy = model.ScoringStrategy;
-                g.TestQuestion = entityQuestion;
-                g.TestPool = entityPool;
-                //g.TestResults = new List<TestResult>();
+                g.Answer = model.Answer;
+                g.IsCorrect = model.IsCorrect;
+                g.TestQuestion = entity;
             };
         }
 
         /// <summary> Существует ли соответствующая запись в БД? </summary>
         /// <remarks> При реализации - просто проверить ключ, в базу лазить НЕ НАДО </remarks>
-        protected override bool ExistsInDatabase(SaveTestPoolEntryModel model)
+        protected override bool ExistsInDatabase(AnswerVariantModel model)
         {
             return model.Id != 0;
         }
 
         /// <summary> При реализации возвращает массив первичных ключей сущности </summary>
-        protected override object[] GetEntityKey(SaveTestPoolEntryModel model)
+        protected override object[] GetEntityKey(AnswerVariantModel model)
         {
             return new object[] { model.Id };
         }

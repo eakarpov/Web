@@ -1,25 +1,26 @@
 ﻿using GraphLabs.DomainModel;
 using GraphLabs.Site.Models.Infrastructure;
 using System.Linq;
+using GraphLabs.Site.Models.TestQuestion;
 
-namespace GraphLabs.Site.Models.Question
+namespace GraphLabs.Site.Models.TestQuestion
 {
-    public sealed class QuestionListModel : ListModelBase<QuestionModel>
+    public sealed class TestQuestionListModel : ListModelBase<TestQuestionModel>
     {
         private readonly IEntityQuery _query;
-        private readonly IEntityBasedModelLoader<QuestionModel, TestQuestion> _modelLoader;
+        private readonly IEntityBasedModelLoader<TestQuestionModel, DomainModel.TestQuestion> _modelLoader;
 
         /// <summary> Модель списка вопросов </summary>
-        public QuestionListModel(IEntityQuery query, IEntityBasedModelLoader<QuestionModel, TestQuestion> modelLoader)
+        public TestQuestionListModel(IEntityQuery query, IEntityBasedModelLoader<TestQuestionModel, DomainModel.TestQuestion> modelLoader)
         {
             _query = query;
             _modelLoader = modelLoader;
         }
 
         /// <summary> Загружает вопросы </summary>
-        protected override QuestionModel[] LoadItems()
+        protected override TestQuestionModel[] LoadItems()
         {
-            return _query.OfEntities<TestQuestion>()
+            return _query.OfEntities<DomainModel.TestQuestion>()
                 .ToArray()
                 .Select(l => _modelLoader.Load(l))
                 .OrderBy(i => i.Category.Name)
